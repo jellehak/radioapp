@@ -1,0 +1,12 @@
+{
+  "name": "vue-petite-pwa",
+  "version": "1.0.0",
+  "description": "Create a static [progressive web app](https://developers.google.com/web/progressive-web-apps/) with a manifest and a serviceworker.",
+  "main": "serviceworker.js",
+  "scripts": {
+    "start": "npx browser-sync"
+  },
+  "keywords": [],
+  "author": "Jelle",
+  "license": "ISC"
+}
