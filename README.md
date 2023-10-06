@@ -10,7 +10,7 @@ Includes:
 
 ### Developing
 
-* Clone the repo: `git clone XXX .`
+* Clone the repo: `git clone https://github.com/jellehak/vue-petite-pwa .`
 * Modify the `manifest.json` with your informations
 * Start writing your website
 
