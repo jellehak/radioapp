@@ -1,23 +1,17 @@
 {
-  "name":"html_template",
-  "short_name":"html_temp",
-  "description": "A simply htm template for static websites.",
-  "lang": "it-IT",
-  "start_url":"?utm_source=manifest",
+  "name":"RadioApp",
+  "short_name":"radioapp",
+  "description": "Radio App",
+  "start_url":"",
   "background_color": "#EEEEEE",
   "theme_color": "#2196F3",
   "display": "standalone",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "img/thumb/64.png",
+      "src": "img/thumb/192.png",
       "type": "image/png",
-      "sizes": "64x64"
-    },
-    {
-      "src": "img/thumb/144.png",
-      "type": "image/png",
-      "sizes": "144x144"
+      "sizes": "192x192"
     },
     {
       "src": "img/thumb/512.png",

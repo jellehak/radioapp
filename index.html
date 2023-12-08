@@ -1,58 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Page title</title>
-  <meta name="description" content="html template page for static websites">
-  <meta name="author" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/png" href="img/favicon.png">
-  <link rel="manifest" href="/manifest.json">
+  <head>
+    <meta charset="utf-8" />
+    <title>RadioApp</title>
+    <meta name="description" content="html template page for static websites" />
+    <meta name="author" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="img/favicon.png" />
+    <link rel="manifest" href="/manifest.json" />
 
-  <script async type="text/javascript">
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/serviceworker.js', {scope: '/pwa_boilerplate/'})
-      .then(function(registration) {
-        registration.addEventListener('updatefound', function() {
-          var installingWorker = registration.installing;
-          console.log('A new service worker is being installed:',
-            installingWorker);
-        });
-      })
-      .catch(function(error) {
-        console.log('Service worker registration failed:', error);
-      });
-    } else {
-      console.log('Service workers are not supported, switch to Firefox!.');
-    }
-  </script>
-
-</head>
-<body>
-
-  <script type="module">
-    import { createApp } from 'https://unpkg.com/petite-vue?module'
-  
-    createApp({
-      // exposed to all expressions
-      count: 0,
-      // getters
-      get plusOne() {
-        return this.count + 1
-      },
-      // methods
-      increment() {
-        this.count++
+    <script async type="text/javascript">
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("/serviceworker.js", { scope: "/pwa_boilerplate/" })
+          .then(function (registration) {
+            registration.addEventListener("updatefound", function () {
+              var installingWorker = registration.installing;
+              console.log(
+                "A new service worker is being installed:",
+                installingWorker
+              );
+            });
+          })
+          .catch(function (error) {
+            console.log("Service worker registration failed:", error);
+          });
+      } else {
+        console.log("Service workers are not supported, switch to Firefox!.");
       }
-    }).mount()
-  </script>
-  
-  <!-- v-scope value can be omitted -->
-  <div v-scope>
-    <p>{{ count }}</p>
-    <p>{{ plusOne }}</p>
-    <button @click="increment">increment</button>
-  </div>
+    </script>
 
-</body>
+    <style>
+      @import url(https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css);
+
+      body { margin: 0; }
+      i-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      i-card {
+        display: flex;
+        flex-direction: column;
+      }
+      i-card img {
+        object-fit: contain;
+      }
+      i-card img {
+        background-color: rgb(200, 221, 240);
+      }
+
+      i-player {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: aliceblue;
+      }
+    </style>
+  </head>
+  <body>
+    <div v-scope>
+      <i-player>
+        <i-card>
+            {{state.current.name}}
+            <img
+              :src="state.current.favicon"
+              loading="lazy"
+              alt="…"
+              width="150"
+              height="150"
+              onerror="this.classList.add('missing')"
+            />
+          </i-card>
+  
+        <audio id="player" controls="controls" autoplay="">
+          <p>Your browser does not support the <code>audio</code> element.</p>
+        </audio>
+      </i-player>
+      
+      <input type="search" v-model="state.search" @input="onSearchInput" placeholder="search for a station">
+      <i-grid>
+        <i-card
+          v-for="item in stations.slice(0,20)"
+          @click="onStationClick(item)"
+        >
+          <img
+            :src="item.favicon"
+            loading="lazy"
+            alt="…"
+            width="150"
+            height="150"
+            onerror="this.classList.add('missing')"
+          />
+          {{item.name}}
+        </i-card>
+      </i-grid>
+    </div>
+
+    <script type="module">
+      import { createApp, reactive } from "https://unpkg.com/petite-vue?module";
+
+      const app = reactive({
+        stations: [],
+        allStations: [],
+        state: {
+          current: {},
+          search: ''
+        },
+        persist() {
+          localStorage.state = JSON.stringify(this.state)
+        },
+        restore() {
+          this.state = localStorage.state && JSON.parse(localStorage.state) || this.state
+        },
+        onSearchInput(item) {
+          this.stations = this.allStations.filter(
+            e => e.name.toLowerCase().includes(this.state.search.toLowerCase())
+          )
+          this.persist()
+        },
+        onStationClick(item) {
+          this.state.current = item;
+          const audio = document.getElementById("player");
+          audio.src = item.url;
+          this.persist()
+        },
+      })
+
+      window.app = app
+
+      app.restore()
+      createApp(app).mount();
+
+      const resp = await fetch(
+        "https://de1.api.radio-browser.info/json/stations/bycountrycodeexact/NL"
+      );
+      const stations = await resp.json();
+      app.allStations = stations
+
+      app.onStationClick({
+        url: "https://playerservices.streamtheworld.com/api/livestream-redirect/SUBLIME.mp3?dist=nederlandfm",
+      });
+    </script>
+  </body>
 </html>
